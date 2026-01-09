@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* EdTech Adaptive Tutoring - Warm Sunrise Design System */
+
+@layer base {
+  :root {
+    /* Warm Sunrise Palette */
+    --background: 30 100% 97%;
+    --foreground: 25 12% 20%;
+
+    /* Cards - Warm off-white/ivory */
+    --card: 35 100% 99%;
+    --card-foreground: 25 12% 20%;
+
+    --popover: 35 100% 99%;
+    --popover-foreground: 25 12% 20%;
+
+    /* Primary - Muted Terracotta */
+    --primary: 16 45% 56%;
+    --primary-foreground: 35 100% 99%;
+
+    /* Secondary - Warm Coral (sparingly) */
+    --secondary: 20 65% 69%;
+    --secondary-foreground: 25 12% 20%;
+
+    /* Muted - Subtle warm tones */
+    --muted: 30 30% 94%;
+    --muted-foreground: 25 10% 45%;
+
+    /* Accent - Lighter terracotta */
+    --accent: 20 50% 92%;
+    --accent-foreground: 16 45% 40%;
+
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 35 100% 99%;
+
+    /* Borders - Very subtle warm gray */
+    --border: 30 20% 88%;
+    --input: 30 20% 88%;
+    --ring: 16 45% 56%;
+
+    --radius: 0.75rem;
+
+    /* Custom gradient tokens */
+    --gradient-start: 25 100% 92%;
+    --gradient-end: 35 85% 93%;
+
+    /* Progress/Success */
+    --success: 145 45% 45%;
+    --success-foreground: 35 100% 99%;
+
+    /* Warning/Review */
+    --warning: 35 85% 55%;
+    --warning-foreground: 25 12% 20%;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+
+/* Warm gradient background utility */
+@layer utilities {
+  .bg-gradient-sunrise {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--gradient-start)) 0%,
+      hsl(var(--gradient-end)) 100%
+    );
+  }
+
+  .bg-gradient-sunrise-subtle {
+    background: linear-gradient(
+      180deg,
+      hsl(30 100% 97%) 0%,
+      hsl(35 80% 95%) 100%
+    );
+  }
+}
