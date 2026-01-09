@@ -66,8 +66,11 @@ class GeminiService {
         // Collect all available API keys for fallback rotation
         this.apiKeys = [
             process.env.GEMINI_API_KEY,
+            process.env.VITE_GEMINI_API_KEY,
             process.env.GEMINI_API_KEY_2,
-            process.env.GEMINI_API_KEY_3
+            process.env.VITE_GEMINI_API_KEY_BACKUP,
+            process.env.GEMINI_API_KEY_3,
+            process.env.GEMINI_API_KEY_4
         ].filter(Boolean); // Remove undefined/empty keys
 
         if (this.apiKeys.length === 0) {
@@ -79,9 +82,8 @@ class GeminiService {
         this.currentKeyIndex = 0;
         this.ai = new GoogleGenAI({ apiKey: this.apiKeys[0] });
 
-        // Using gemini-2.0-flash-exp (experimental) for development
-        // Note: v1beta API doesn't support gemini-1.5-flash models (404 errors)
-        this.modelName = 'gemini-2.0-flash-exp';
+        // Using gemini-1.5-flash for better stability and rate limits
+        this.modelName = 'gemini-2.5-flash';
     }
 
     /**
@@ -117,7 +119,7 @@ class GeminiService {
                 maxOutputTokens: 2048,
                 ...config,
                 responseMimeType: "application/json",
-                responseJsonSchema: schema
+                responseSchema: schema
             };
 
             const response = await this.ai.models.generateContent({

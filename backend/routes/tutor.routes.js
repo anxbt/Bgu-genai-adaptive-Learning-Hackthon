@@ -6,15 +6,14 @@
 const express = require('express');
 const router = express.Router();
 
-const diagnosisService = require('../services/diagnosis.service');
-const questionService = require('../services/question.service');
 const geminiService = require('../services/gemini.service');
 const ResponseFormatter = require('../utils/responseFormatter');
-const { getExplanationPrompt } = require('../prompts/explanation.prompt');
+const { getCombinedAttemptPrompt, combinedAttemptSchema } = require('../prompts/combined.prompt');
 
 /**
  * POST /api/attempt
  * Accept student attempt and generate targeted explanation
+ * OPTIMIZED: Single API call instead of 3 separate calls
  */
 router.post('/attempt', async (req, res) => {
     try {
@@ -29,35 +28,37 @@ router.post('/attempt', async (req, res) => {
             );
         }
 
-        // Step 1: Diagnose the misunderstanding
-        console.log('Diagnosing student attempt...');
-        const diagnosis = await diagnosisService.diagnose(
-            question,
-            studentAnswer,
-            expectedConcept
-        );
-        console.log('Diagnosis:', diagnosis);
-
-        // Step 2: Generate structured explanation using JSON schema
-        console.log('Generating explanation...');
-        const explanationPrompt = getExplanationPrompt(
+        // OPTIMIZED: Single combined API call for diagnosis + explanation + retry question
+        console.log('Processing student attempt with single API call...');
+        const combinedPrompt = getCombinedAttemptPrompt(
             subject,
             topic,
             question,
             studentAnswer,
-            expectedConcept,
-            diagnosis
-        );
-        const explanation = await geminiService.generateExplanation(explanationPrompt);
-        console.log('Explanation generated');
-
-        // Step 3: Generate retry question
-        console.log('Generating retry question...');
-        const retryQuestion = await questionService.generateRetryQuestion(
-            question,
             expectedConcept
         );
-        console.log('Retry question generated');
+
+        const result = await geminiService.generateStructuredContent(
+            combinedPrompt,
+            combinedAttemptSchema,
+            { temperature: 0.6 }
+        );
+
+        // Debug: Log full response structure
+        console.log('Combined result received:', JSON.stringify(result, null, 2));
+
+        // Ensure we have all required fields with fallbacks
+        const diagnosis = result?.diagnosis || 'conceptual';
+        const explanation = result?.explanation || {
+            coreIdea: 'Please review the concept.',
+            keyMistake: 'Unable to determine specific mistake.',
+            analogy: 'Think of it like a real-world example.',
+            takeaway: 'Focus on understanding the fundamentals.'
+        };
+        const retryQuestion = result?.retryQuestion || {
+            question: 'Can you explain this concept in your own words?',
+            hint: 'Focus on the core principle.'
+        };
 
         // Format and send response
         const responseData = ResponseFormatter.attemptResponse(
